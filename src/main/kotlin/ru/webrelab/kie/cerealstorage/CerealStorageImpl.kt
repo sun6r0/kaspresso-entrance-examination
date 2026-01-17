@@ -26,12 +26,12 @@ class CerealStorageImpl(
         val currentAmount = storage[cereal] ?: 0f
 
         if (currentAmount == 0f) {
-            val usedCapacity = storage.values.sum()
-            if (usedCapacity + containerCapacity > storageCapacity) {
+            val usedContainers = storage.size
+            if ((usedContainers + 1) * containerCapacity > storageCapacity) {
                 throw IllegalStateException("Хранилище не позволяет разместить ещё один контейнер для новой крупы")
             }
-
         }
+
         val availableSpace = containerCapacity - currentAmount
 
         if (amount <= availableSpace) {
@@ -50,14 +50,10 @@ class CerealStorageImpl(
 
         if (currentAmount >= amount) {
             val newAmount = currentAmount - amount
-            if (newAmount > 0) {
-                storage[cereal] = newAmount
-            } else {
-                storage.remove(cereal)
-            }
+            storage[cereal] = newAmount
             return amount
         } else {
-            storage.remove(cereal)
+            storage[cereal] = 0f
             return currentAmount
         }
     }

@@ -86,6 +86,19 @@ class CerealStorageImplTest {
     }
 
     @Test
+    fun `addCereal should respect container count limit not total cereal amount`() {
+        val customStorage = CerealStorageImpl(10f, 22f)
+
+        customStorage.addCereal(Cereal.BUCKWHEAT, 1f)
+        customStorage.addCereal(Cereal.RICE, 1f)
+
+        val exception = assertThrows<IllegalStateException> {
+            customStorage.addCereal(Cereal.MILLET, 1f)
+        }
+        assertEquals("Хранилище не позволяет разместить ещё один контейнер для новой крупы", exception.message)
+    }
+
+    @Test
     fun `removeContainer should return true for empty container`() {
         storage.addCereal(Cereal.BUCKWHEAT, 0f)
         val result = storage.removeContainer(Cereal.BUCKWHEAT)
@@ -138,10 +151,11 @@ class CerealStorageImplTest {
     }
 
     @Test
-    fun `getCereal should remove container when emptied`() {
+    fun `getCereal should NOT remove container when emptied`() {
         storage.addCereal(Cereal.MILLET, 3f)
         storage.getCereal(Cereal.MILLET, 3f)
         assertEquals(0f, storage.getAmount(Cereal.MILLET), 0.01f)
+        assertTrue(storage.removeContainer(Cereal.MILLET)) // Теперь можно удалить
     }
 
     @Test
