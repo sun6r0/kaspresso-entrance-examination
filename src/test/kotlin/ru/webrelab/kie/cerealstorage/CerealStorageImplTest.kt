@@ -99,6 +99,25 @@ class CerealStorageImplTest {
     }
 
     @Test
+    fun `should handle re-adding to emptied container when storage is full`() {
+        val customStorage = CerealStorageImpl(10f, 20f)
+        customStorage.addCereal(Cereal.RICE, 1f)
+        customStorage.addCereal(Cereal.BUCKWHEAT, 1f)
+
+        customStorage.getCereal(Cereal.RICE, 1f)
+        assertEquals(0f, customStorage.getAmount(Cereal.RICE), 0.01f)
+
+        val remaining = customStorage.addCereal(Cereal.RICE, 5f)
+        assertEquals(0f, remaining, 0.01f)
+        assertEquals(5f, customStorage.getAmount(Cereal.RICE), 0.01f)
+
+        val exception = assertThrows<IllegalStateException> {
+            customStorage.addCereal(Cereal.MILLET, 1f)
+        }
+        assertEquals("Хранилище не позволяет разместить ещё один контейнер для новой крупы", exception.message)
+    }
+
+    @Test
     fun `removeContainer should return true for empty container`() {
         storage.addCereal(Cereal.BUCKWHEAT, 0f)
         val result = storage.removeContainer(Cereal.BUCKWHEAT)

@@ -23,15 +23,14 @@ class CerealStorageImpl(
     override fun addCereal(cereal: Cereal, amount: Float): Float {
         require(amount >= 0) { "Количество не может быть отрицательным" }
 
-        val currentAmount = storage[cereal] ?: 0f
-
-        if (currentAmount == 0f) {
+        if (cereal !in storage) {
             val usedContainers = storage.size
             if ((usedContainers + 1) * containerCapacity > storageCapacity) {
                 throw IllegalStateException("Хранилище не позволяет разместить ещё один контейнер для новой крупы")
             }
         }
 
+        val currentAmount = storage[cereal] ?: 0f
         val availableSpace = containerCapacity - currentAmount
 
         if (amount <= availableSpace) {
